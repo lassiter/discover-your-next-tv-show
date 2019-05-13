@@ -5,3 +5,16 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+require 'pry'
+
+unless Pathname.new("tmp/tmdb_exports/tv_series_ids.json").exist?
+  puts "Did not find local tv_series_ids.json file, fetching and updating database \nThis normally takes about 6 minutes to process 80,000 + records"
+  Rake::Task['rake get_tmdb_export:shows'].invoke()
+  sleep 360
+else
+  puts "Found local tv_series_ids.json file, skipping fetch."
+end
+
+puts "Starting to Seed Redis Instant Search\nThis normally takes 3 to 4 minutes"
+# Seed Redis Instant Search
+SearchSuggestion.seed

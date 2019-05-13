@@ -1,6 +1,7 @@
 require "pry"
 require 'zlib'
 require 'stringio'
+require 'httparty'
 
 namespace :get_tmdb_export do  
   desc "TODO"
@@ -9,6 +10,7 @@ namespace :get_tmdb_export do
 
   desc "Download daily export from TMDB and update"
   task shows: :environment do
+    puts Time.now
       # Get daily export
       response = get_data_from_TMDB("tv_series_ids")
       File.readlines(response).each do |line|
@@ -22,6 +24,7 @@ namespace :get_tmdb_export do
           end
         end
       end
+    puts Time.now
   end
 
   desc "TODO"
@@ -39,7 +42,7 @@ namespace :get_tmdb_export do
   def update_record(klass, id, parsed_line)
     record = klass.find(id)
     parsed_line.each do |key, value|
-      record.update_attribute(key, value) if record[key] !== value
+      record.update_attribute(key, value) if record[key] != value
     end
   end
 
@@ -47,17 +50,23 @@ namespace :get_tmdb_export do
     Dir.mkdir("tmp/tmdb_exports") unless File.directory?("tmp/tmdb_exports")
     # need to wait on file to be created
     # binding.pry
-    # sh `cd tmp/tmdb_exports && curl http://files.tmdb.org/p/exports/#{type}_#{Date.today.prev_day.strftime("%d_%m_%Y")}.json.gz?api_key=#{ENV['TMDB_API_KEY']} --output #{type}.json.gz && gunzip #{type}.json.gz && rm #{type}.json.gz`
-    uri = URI.parse("http://files.tmdb.org/p/exports/#{type}_#{Date.today.prev_day.strftime("%d_%m_%Y")}.json.gz?api_key=#{ENV['TMDB_API_KEY']}")
-    Net::HTTP.start(uri.host, uri.port) do |http|
-      resp = http.get(uri.path)
-      # Create file latest export for type
-      file = File.open(File.join(Dir.pwd, "tmp/tmdb_exports", "#{type}.json"),"w+")
-      # Write uncompressed gunzip string to file
-      file.write(Zlib::GzipReader.new(StringIO.new(resp.body.to_s)).read)
-      file.close
-      file
+
+    stop = 8
+    current_time = DateTime.now.utc
+    if !(7..stop).cover?(current_time) && current_time > stop
+      # Outside Export Time
+      url = "http://files.tmdb.org/p/exports/#{type}_#{Date.today.strftime("%m_%d_%Y")}.json.gz"
+    else
+      # During Export 
+      url = "http://files.tmdb.org/p/exports/#{type}_#{Date.today.prev_day.strftime("%m_%d_%Y")}.json.gz"
     end
+    # sh `cd tmp/tmdb_exports && curl http://files.tmdb.org/p/exports/#{type}_#{Date.today.prev_day.strftime("%m_%d_%Y")}.json.gz --output #{type}.json.gz && gunzip #{type}.json.gz && rm #{type}.json.gz`
+    resp = HTTParty.get("http://files.tmdb.org/p/exports/#{type}_#{Date.today.prev_day.strftime("%m_%d_%Y")}.json.gz")
+    file = File.open(File.join(Dir.pwd, "tmp/tmdb_exports", "#{type}.json"),"w+")
+    # Write uncompressed gunzip string to 
+    file.write(Zlib::GzipReader.new(StringIO.new(resp.body.to_s)).read)
+    file.close
+    file
   end
   
 end

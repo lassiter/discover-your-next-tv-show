@@ -28,7 +28,16 @@ module Discovery
         ENV[key.to_s] = value
       end if File.exists?(env_file)
     end
+    config.api_only = true
 
+    Rails.application.config.middleware.insert_before 0, Rack::Cors do
+      allow do
+        origins '*'
+        resource '*',
+          headers: :any,
+          methods: %i(get post put patch delete options head)
+      end
+    end
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
 

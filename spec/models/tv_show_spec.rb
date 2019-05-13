@@ -1,5 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe TvShow, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  xit "Test Alias Attribue"
+  # Post-poned because of advice at https://stackoverflow.com/questions/39823445/testing-an-association-with-an-alias-attribute
 end
