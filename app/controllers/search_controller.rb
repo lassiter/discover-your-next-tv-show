@@ -5,7 +5,7 @@ class SearchController < ApplicationController
       klass = Object.const_get(search_params["class"])
       case search_params["by"]
       when "slug"
-        title = search_params["q"].split("-").join(" ")
+        title = search_params["q"].split("_").join(" ")
         result = TvShow.where('title ILIKE ?', "%#{title}%").order(popularity: :desc).limit(1).first
         if result.nil?
           render json: { status: 404 }, status: :not_found
