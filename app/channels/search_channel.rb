@@ -1,4 +1,4 @@
-require "pry"
+
 class SearchChannel < ApplicationCable::Channel
   def subscribed
     stream_for 'SearchChannel'

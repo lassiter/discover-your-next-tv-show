@@ -1,4 +1,4 @@
-require "pry"
+
 require 'zlib'
 require 'stringio'
 require 'httparty'
@@ -49,7 +49,6 @@ namespace :get_tmdb_export do
   def get_data_from_TMDB(type)
     Dir.mkdir("tmp/tmdb_exports") unless File.directory?("tmp/tmdb_exports")
     # need to wait on file to be created
-    # binding.pry
 
     stop = 8
     current_time = DateTime.now.utc
