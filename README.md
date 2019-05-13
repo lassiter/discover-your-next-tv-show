@@ -1,1 +1,1 @@
-# discover-your-next-tv-show
+Please view the readme here: 
