@@ -80,6 +80,7 @@ test:
 #
 production:
   <<: *default
+  url: <%= ENV['DATABASE_URL'] %>
   database: discovery_production
   username: discovery
   password: <%= ENV['discovery_DATABASE_PASSWORD'] %>
