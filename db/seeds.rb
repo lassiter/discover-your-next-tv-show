@@ -8,7 +8,7 @@
 
 unless Pathname.new("tmp/tmdb_exports/tv_series_ids.json").exist?
   puts "Did not find local tv_series_ids.json file, fetching and updating database \nThis normally takes about 6 minutes to process 80,000 + records"
-  Rake::Task['rake get_tmdb_export:shows'].invoke()
+  Rake::Task['get_tmdb_export:shows'].invoke()
   sleep 360
 else
   puts "Found local tv_series_ids.json file, skipping fetch."
